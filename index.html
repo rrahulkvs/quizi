@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
@@ -363,7 +364,10 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
       </div>
     </div>
     <div class="card">
-      <div class="card-header"><div><h3>📋 Published Trainings</h3><p>Activate · Republish · Delete · Report</p></div></div>
+      <div class="card-header">
+        <div><h3>📋 Published Trainings</h3><p>Activate · Republish · Delete · Report</p></div>
+        <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 12px;" type="button" onclick="renderPublishedList();toast('🔄 Refreshed!');">🔄 Refresh</button>
+      </div>
       <div class="card-body"><div id="publishedList"></div></div>
     </div>
     <div class="card">
@@ -554,7 +558,9 @@ function toast(msg){
 /* ── SCREEN ── */
 function showScreen(name){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  $("screen-"+name).classList.add("active"); playClick();
+  $("screen-"+name).classList.add("active");
+  if(name==="admin" && state.adminLoggedIn){ renderPublishedList(); renderQuestions(); }
+  playClick();
 }
 
 /* ── SOUND ── */
@@ -748,7 +754,12 @@ window.downloadReport=function(code){
   const pub=loadPublished(); const quiz=pub[code];
   if(!quiz){toast("Training not found.");playError();return;}
   const rows=getQuizReports(quiz.code);
-  if(!rows.length){toast("⚠️ No participants have joined yet.");return;}
+  console.log('[Report] Code:', quiz.code, '| Rows found:', rows.length, '| All reports:', JSON.stringify(loadReports()).slice(0,300));
+  if(!rows.length){
+    toast("⚠️ No participants found for: "+quiz.code);
+    playError();
+    return;
+  }
 
   const completed=rows.filter(r=>r.status==="Completed");
   const notCompleted=rows.filter(r=>r.status!=="Completed");
@@ -1065,7 +1076,70 @@ $("closeSecurityBtn").addEventListener("click",closeSecModal);
 $("savePassBtn").addEventListener("click",savePassword);
 window.addEventListener("hashchange",loadQuizFromUrl);
 
+/* ── MIGRATE OLD DATA (one-time) ── 
+   Old versions stored reports/players by quiz.id
+   New version uses quiz.code — migrate on startup
+*/
+function migrateOldData(){
+  try {
+    const pub = loadPublished();
+    const reports = loadReports();
+    const players = loadPlayers();
+    let changed = false;
+
+    Object.values(pub).forEach(quiz => {
+      const codeKey = String(quiz.code).trim().toUpperCase();
+      const idKey   = String(quiz.id);
+
+      // If data exists under id-key but NOT under code-key, migrate it
+      if(reports[idKey] && !reports[codeKey]){
+        reports[codeKey] = reports[idKey];
+        // don't delete old key yet — safe migration
+        changed = true;
+        console.log('[Migrate] Reports moved:', idKey, '->', codeKey, reports[codeKey].length, 'rows');
+      }
+      if(players[idKey] && !players[codeKey]){
+        players[codeKey] = players[idKey];
+        changed = true;
+        console.log('[Migrate] Players moved:', idKey, '->', codeKey);
+      }
+
+      // Also migrate old storage key variants (v1,v2,v3)
+      ['telesales.reports.v1','telesales.reports.v2','telesales.reports.v3'].forEach(oldKey => {
+        try {
+          const old = JSON.parse(localStorage.getItem(oldKey)||'{}');
+          // find by code or id
+          const rows = old[codeKey] || old[idKey];
+          if(rows && rows.length && !reports[codeKey]){
+            reports[codeKey] = rows;
+            changed = true;
+            console.log('[Migrate] Reports from', oldKey, '->', codeKey, rows.length, 'rows');
+          }
+        } catch(e){}
+      });
+
+      ['telesales.players.v1','telesales.players.v2','telesales.players.v3'].forEach(oldKey => {
+        try {
+          const old = JSON.parse(localStorage.getItem(oldKey)||'{}');
+          const rows = old[codeKey] || old[idKey];
+          if(rows && rows.length && !players[codeKey]){
+            players[codeKey] = rows;
+            changed = true;
+          }
+        } catch(e){}
+      });
+    });
+
+    if(changed){
+      saveReports(reports);
+      savePlayers(players);
+      console.log('[Migrate] Data migration complete');
+    }
+  } catch(e){ console.error('[Migrate] Error:', e); }
+}
+
 /* ── INIT ── */
+migrateOldData();
 updateAdmin();
 renderQuestions();
 const linked=loadQuizFromUrl();
