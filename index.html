@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
@@ -634,11 +633,15 @@ $("hurrayResultsBtn").addEventListener("click",()=>{ $("hurrayOverlay").classLis
 $("hurrayHomeBtn").addEventListener("click",()=>{ $("hurrayOverlay").classList.remove("active"); showScreen("home"); playClick(); });
 
 /* ── REPORTS — FIXED ── */
-function getQuizReports(quizId){ return loadReports()[quizId]||[]; }
+function getQuizReports(quizId){ 
+  const key=String(quizId).trim().toUpperCase();
+  const r=loadReports(); 
+  return r[key]||[]; 
+}
 
 function upsertReport(quiz,employee,patch){
   const allReports = loadReports();
-  const qid = String(quiz.id);
+  const qid = String(quiz.code).trim().toUpperCase();  // use code — always stable
   if(!allReports[qid]) allReports[qid] = [];
   const rows = allReports[qid];
   const empCode = String(employee.code).trim();
@@ -659,7 +662,7 @@ function upsertReport(quiz,employee,patch){
 /* ── REGISTER — ONE ATTEMPT ── */
 function registerEmployee(quiz,employee){
   const all=loadPlayers();
-  const qid=String(quiz.id);
+  const qid=String(quiz.code).trim().toUpperCase();  // use code — always stable
   if(!all[qid]) all[qid]=[];
   const empCode=String(employee.code).trim();
   if(all[qid].some(p=>String(p.code).trim()===empCode))
@@ -700,7 +703,7 @@ function renderPublishedList(){
   const quizzes=Object.values(loadPublished()).sort((a,b)=>String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
   if(!quizzes.length){ list.innerHTML='<div class="no-data">No published trainings yet. Create one above! 👆</div>'; return; }
   list.innerHTML=quizzes.map(quiz=>{
-    const reports=getQuizReports(quiz.id);
+    const reports=getQuizReports(quiz.code);
     const completed=reports.filter(r=>r.status==="Completed").length;
     const active=quiz.active!==false;
     return `<div class="pub-item">
@@ -744,7 +747,7 @@ window.deleteQuiz=function(code){
 window.downloadReport=function(code){
   const pub=loadPublished(); const quiz=pub[code];
   if(!quiz){toast("Training not found.");playError();return;}
-  const rows=getQuizReports(quiz.id);
+  const rows=getQuizReports(quiz.code);
   if(!rows.length){toast("⚠️ No participants have joined yet.");return;}
 
   const completed=rows.filter(r=>r.status==="Completed");
@@ -871,8 +874,11 @@ function loadQuizFromUrl(){
     const quiz=decodeQuiz(window.location.hash.slice(6));
     const pub=loadPublished();
     const local=pub[quiz.code];
-    pub[quiz.code]=local ? {...quiz,active:local.active!==false} : {...quiz,active:true};
-    savePublished(pub);
+    // Always preserve stored quiz — NEVER overwrite with URL version (id could differ)
+    if(!local){
+      pub[quiz.code]={...quiz,active:true};
+      savePublished(pub);
+    }
     $("roomCode").value=quiz.code;
     $("linkStatus").className="link-status";
     $("linkStatus").innerHTML=`<span>✅</span> ${esc(pub[quiz.code].title)} loaded`;
@@ -964,12 +970,21 @@ window.chooseAnswer=function(index){
 /* ── FINISH & SAVE REPORT ── */
 function finishQuiz(){
   $("progressBar").style.width="100%";
-  // ★ Save report with correct data — guaranteed persist
+  // ★ Save report — using quiz.code as key (stable)
+  const reportData = {
+    status:"Completed",
+    score: state.score,
+    completedAt: new Date().toISOString(),
+    totalQuestions: state.currentQuiz.questions.length
+  };
   upsertReport(
     state.currentQuiz,
     {code:state.employeeCode, name:state.employeeName},
-    {status:"Completed", score:state.score, completedAt:new Date().toISOString(), totalQuestions:state.currentQuiz.questions.length}
+    reportData
   );
+  // Verify save worked
+  const saved = getQuizReports(state.currentQuiz.code);
+  console.log("[Quiz] Report saved for", state.currentQuiz.code, "| Total rows:", saved.length, "| Data:", JSON.stringify(reportData));
   showHurray();
 }
 
