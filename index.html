@@ -1,4 +1,6 @@
+bash
 
+cat > /mnt/user-data/outputs/telesales_quiz_fixed.html << 'HTMLEOF'
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
@@ -37,24 +39,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(circle at 15% 15%,rgba(124,58,237,0.07) 0%,transparent 50%),
              radial-gradient(circle at 85% 80%,rgba(236,72,153,0.06) 0%,transparent 50%);}
 .app{position:relative;z-index:1;min-height:100vh;}
-
-/* DOODLES */
 .doodle-el{position:fixed;pointer-events:none;z-index:0;animation:doodleFloat ease-in-out infinite;}
 @keyframes doodleFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(7deg)}}
-
-/* NAV */
 .topnav{display:flex;align-items:center;justify-content:space-between;padding:10px 28px;gap:12px;background:var(--nav-bg);border-bottom:2.5px solid var(--nav-border);box-shadow:var(--shadow);position:sticky;top:0;z-index:50;transition:background .3s,border-color .3s;}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Fredoka One',sans-serif;font-size:1.45rem;color:var(--purple);}
 .brand-icon{font-size:1.75rem;display:inline-block;animation:wiggle 2.8s ease-in-out infinite;}
 @keyframes wiggle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
 .nav-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-
-/* SCREENS */
 .screen{display:none;animation:fadeUp .38s cubic-bezier(.22,1,.36,1) both;}
 .screen.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-
-/* BUTTONS */
 .btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:.92rem;border:none;cursor:pointer;border-radius:12px;padding:10px 20px;transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s,filter .15s;display:inline-flex;align-items:center;gap:7px;position:relative;user-select:none;white-space:nowrap;}
 .btn:hover{transform:translateY(-2px);filter:brightness(1.07);}
 .btn:active{transform:translateY(1px) scale(.97);}
@@ -74,8 +68,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .btn.full{width:100%;justify-content:center;}
 .btn.lg{font-size:1.08rem;padding:14px 26px;border-radius:14px;}
 .btn-sm{font-size:.8rem;padding:7px 13px;min-height:34px;}
-
-/* HOME */
 .home-wrap{max-width:1100px;margin:0 auto;padding:44px 24px;display:grid;grid-template-columns:1fr 400px;gap:48px;align-items:center;min-height:calc(100vh - 60px);}
 .home-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#ede9fe,#fce7f3);border:2px solid var(--border);color:var(--purple);font-weight:900;font-size:.78rem;padding:6px 16px;border-radius:999px;margin-bottom:18px;letter-spacing:.07em;text-transform:uppercase;animation:badgePulse 3s ease-in-out infinite;}
 @keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,.25)}50%{box-shadow:0 0 0 7px rgba(124,58,237,0)}}
@@ -86,8 +78,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .home-chips{display:flex;gap:10px;flex-wrap:wrap;}
 .chip-pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:2px solid var(--border);color:var(--text);font-weight:800;font-size:.85rem;padding:8px 16px;border-radius:999px;box-shadow:0 2px 8px rgba(124,58,237,.07);transition:transform .2s,border-color .2s;}
 .chip-pill:hover{transform:translateY(-2px);border-color:var(--purple);}
-
-/* JOIN CARD */
 .join-card{background:var(--card);border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg);border:2.5px solid var(--border);animation:cardPop .55s .1s cubic-bezier(.22,1,.36,1) both;}
 @keyframes cardPop{from{opacity:0;transform:scale(.9) translateY(22px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .join-header{background:linear-gradient(135deg,var(--purple),var(--pink));padding:20px 24px;color:#fff;}
@@ -96,16 +86,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .join-body{padding:22px;}
 .link-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-weight:800;font-size:.83rem;margin-bottom:14px;background:#f0fdf4;border:2px solid #bbf7d0;color:#166534;}
 .link-status.none{background:var(--bg2);border-color:var(--border);color:var(--muted);}
-
-/* FIELDS */
 .field{margin-bottom:14px;}
 .field label{display:block;font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
 .field input,.field textarea,.field select{width:100%;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;padding:12px 15px;border:2.5px solid var(--border);border-radius:12px;outline:none;color:var(--text);background:var(--input-bg);transition:border-color .2s,box-shadow .2s,background .2s;}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(124,58,237,.12);background:var(--card);}
 .field select option{background:var(--card);color:var(--text);}
 .field textarea{min-height:80px;resize:vertical;}
-
-/* ADMIN */
 .admin-wrap{max-width:1180px;margin:0 auto;padding:28px 22px;display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start;}
 .card{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);border:2px solid var(--border);margin-bottom:18px;transition:background .3s,border-color .3s;}
 .card-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--border);background:linear-gradient(135deg,var(--bg2),var(--card));}
@@ -113,8 +99,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .card-header p{font-size:.8rem;color:var(--muted);margin-top:2px;}
 .card-body{padding:20px;}
 .count-badge{background:var(--purple);color:#fff;font-weight:900;font-size:.76rem;padding:4px 12px;border-radius:999px;}
-
-/* Q ITEMS */
 .q-item{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:start;padding:14px;border:2px solid var(--border);border-radius:16px;margin-bottom:10px;background:var(--pub-bg);transition:border-color .2s,transform .2s,box-shadow .2s;animation:popIn .24s cubic-bezier(.22,1,.36,1) both;}
 .q-item:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:0 4px 16px rgba(124,58,237,.12);}
 @keyframes popIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
@@ -126,8 +110,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .q-info{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
 .q-pts-badge{display:inline-flex;align-items:center;gap:3px;background:var(--yellow);color:#78350f;font-weight:900;font-size:.72rem;padding:2px 10px;border-radius:999px;}
 .q-time-badge{display:inline-flex;align-items:center;gap:3px;background:#dbeafe;color:#1e40af;font-weight:900;font-size:.72rem;padding:2px 10px;border-radius:999px;}
-
-/* PUB ITEMS */
 .pub-item{padding:16px;border:2px solid var(--border);border-radius:16px;margin-bottom:10px;background:var(--pub-bg);transition:border-color .2s,transform .2s;}
 .pub-item:hover{border-color:var(--purple);transform:translateY(-1px);}
 .pub-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px;}
@@ -137,15 +119,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .status-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:999px;font-weight:800;font-size:.76rem;flex-shrink:0;}
 .s-active{background:#d1fae5;color:#065f46;}
 .s-inactive{background:#fee2e2;color:#991b1b;}
-
-/* SHARE BOX */
 .share-box{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:2px solid #bbf7d0;border-radius:16px;padding:16px;margin-top:14px;}
 .share-box h4{font-family:'Fredoka One',sans-serif;color:var(--green);margin-bottom:10px;}
 .room-code-display{font-family:'Fredoka One',sans-serif;font-size:2rem;background:var(--green);color:#fff;text-align:center;padding:10px;border-radius:12px;letter-spacing:.15em;margin-bottom:12px;box-shadow:0 4px 0 var(--green2);}
 .url-row{display:flex;gap:8px;align-items:center;}
 .url-row input{flex:1;font-size:.8rem;padding:10px 12px;border:2px solid #bbf7d0;border-radius:10px;background:#fff;color:#1e1b4b;font-family:monospace;font-weight:700;outline:none;}
-
-/* PLAY */
 .play-wrap{max-width:860px;margin:0 auto;padding:24px 18px;}
 .play-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;background:var(--card);border-radius:18px;padding:14px 20px;border:2px solid var(--border);box-shadow:var(--shadow);}
 .play-info h2{font-family:'Fredoka One',sans-serif;font-size:1.25rem;color:var(--purple);}
@@ -154,12 +132,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .score-box.bump{animation:scoreBump .35s cubic-bezier(.34,1.56,.64,1);}
 @keyframes scoreBump{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
 .score-box small{display:block;font-family:'Nunito',sans-serif;font-size:.68rem;font-weight:800;opacity:.85;}
-
-/* PROGRESS */
 .prog-wrap{background:var(--bg2);border-radius:999px;height:10px;overflow:hidden;margin-bottom:16px;border:1px solid var(--border);}
 .prog-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:999px;transition:width .5s cubic-bezier(.4,0,.2,1);}
-
-/* TIMER */
 .timer-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
 .timer-ring{width:70px;height:70px;position:relative;}
 .timer-ring svg{transform:rotate(-90deg);}
@@ -168,8 +142,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ring-fill.urgent{stroke:var(--red);animation:urgentPulse .55s ease-in-out infinite alternate;}
 @keyframes urgentPulse{from{opacity:1}to{opacity:.45}}
 .timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',sans-serif;font-size:1.4rem;color:var(--text);}
-
-/* Q CARD */
 .q-card{background:var(--card);border-radius:22px;padding:28px;margin-bottom:20px;box-shadow:var(--shadow-lg);border:2.5px solid var(--border);position:relative;overflow:hidden;animation:qSlide .38s cubic-bezier(.22,1,.36,1) both;}
 @keyframes qSlide{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
 .q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--purple),var(--pink),var(--orange),var(--yellow));}
@@ -180,8 +152,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .diff-hard{background:#fee2e2;color:#991b1b;}
 .q-text-big{font-family:'Fredoka One',sans-serif;font-size:clamp(1.3rem,4vw,2rem);line-height:1.22;color:var(--text);}
 .q-pts-tag{display:inline-flex;align-items:center;gap:5px;background:var(--yellow);color:#78350f;font-weight:900;font-size:.8rem;padding:4px 14px;border-radius:999px;margin-top:12px;}
-
-/* ANSWERS */
 .answers-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
 .ans-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;border:none;cursor:pointer;border-radius:20px;padding:20px 18px;text-align:left;display:flex;align-items:center;gap:12px;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,filter .15s;position:relative;color:#fff;min-height:88px;overflow:hidden;}
 .ans-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .2s;}
@@ -197,8 +167,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ans-btn.wrong{background:#9ca3af!important;box-shadow:0 4px 0 #6b7280!important;opacity:.6;transform:scale(.97)!important;}
 @keyframes correctPop{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
 .ans-key{width:38px;height:38px;border-radius:10px;flex-shrink:0;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:'Fredoka One',sans-serif;font-size:1.1rem;border:2px solid rgba(255,255,255,.3);}
-
-/* HURRAY OVERLAY */
 .hurray-overlay{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(10,8,30,.9);backdrop-filter:blur(10px);flex-direction:column;}
 .hurray-overlay.active{display:flex;}
 #hurrayCanvas{position:absolute;inset:0;pointer-events:none;z-index:0;}
@@ -213,8 +181,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .hurray-score{font-family:'Fredoka One',sans-serif;font-size:3.2rem;color:#fff;line-height:1;}
 .hurray-pts-lbl{font-size:.78rem;color:rgba(255,255,255,.8);font-weight:800;text-transform:uppercase;letter-spacing:.1em;}
 .hurray-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-
-/* RESULTS */
 .results-wrap{max-width:680px;margin:0 auto;padding:40px 20px;text-align:center;}
 .trophy-big{font-size:5.5rem;display:block;margin-bottom:10px;animation:trophyPop .6s cubic-bezier(.34,1.56,.64,1) both;}
 @keyframes trophyPop{0%{transform:scale(0) rotate(-15deg)}70%{transform:scale(1.15) rotate(4deg)}100%{transform:scale(1) rotate(0)}}
@@ -228,8 +194,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .stat-card{background:var(--bg2);border-radius:14px;padding:14px 10px;border:2px solid var(--border);}
 .stat-val{font-family:'Fredoka One',sans-serif;font-size:1.7rem;color:var(--purple);}
 .stat-lbl{font-size:.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
-
-/* MODAL */
 .modal-backdrop{position:fixed;inset:0;display:none;place-items:center;padding:18px;background:rgba(14,12,40,.6);z-index:200;backdrop-filter:blur(8px);}
 .modal-backdrop.active{display:grid;}
 .modal{background:var(--card);border-radius:24px;width:min(700px,100%);max-height:92vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.3);animation:modalPop .32s cubic-bezier(.22,1,.36,1) both;border:2px solid var(--border);}
@@ -238,16 +202,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .modal-hdr h3{font-family:'Fredoka One',sans-serif;font-size:1.28rem;}
 .modal-body{padding:24px;}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
-
-/* TOAST */
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none;}
 .toast-item{background:var(--text);color:var(--bg);font-weight:800;font-size:.88rem;padding:10px 22px;border-radius:999px;border:2px solid rgba(255,255,255,.1);box-shadow:0 6px 20px rgba(0,0,0,.25);animation:tIn .28s cubic-bezier(.22,1,.36,1) both,tOut .28s 2.8s ease forwards;white-space:nowrap;}
 @keyframes tIn{from{opacity:0;transform:translateY(8px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes tOut{to{opacity:0;transform:translateY(-6px) scale(.9)}}
-
 .cp{position:fixed;z-index:350;pointer-events:none;border-radius:2px;animation:cpFall ease forwards;}
 @keyframes cpFall{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}100%{transform:translate(var(--dx),110vh) rotate(720deg) scale(.2);opacity:0}}
-
 .hidden{display:none!important}
 .row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
 .admin-sec-link{margin-top:12px;display:block;text-align:center;color:var(--purple);font-weight:800;font-size:.8rem;cursor:pointer;text-decoration:underline;}
@@ -269,14 +229,11 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
 </style>
 </head>
 <body>
-
-<!-- DOODLES -->
 <svg class="doodle-el" style="top:7%;left:3%;width:66px;opacity:.14;animation-duration:4s;" viewBox="0 0 80 80" fill="none"><polygon points="40,5 49,29 75,29 54,46 62,71 40,55 18,71 26,46 5,29 31,29" fill="#7c3aed"/></svg>
 <svg class="doodle-el" style="top:24%;right:2.5%;width:52px;opacity:.13;animation-duration:5.5s;animation-delay:1s;" viewBox="0 0 60 90" fill="none"><polygon points="38,2 10,48 30,48 22,88 55,38 34,38" fill="#ec4899"/></svg>
 <svg class="doodle-el" style="bottom:17%;left:1.5%;width:62px;opacity:.13;animation-duration:6s;animation-delay:2s;" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="36" r="32" fill="#3b82f6"/><polygon points="24,62 36,50 44,62" fill="#3b82f6"/><circle cx="28" cy="32" r="5" fill="white"/><circle cx="40" cy="32" r="5" fill="white"/><circle cx="52" cy="32" r="5" fill="white"/></svg>
 <svg class="doodle-el" style="bottom:9%;right:3%;width:52px;opacity:.13;animation-duration:7s;animation-delay:.5s;" viewBox="0 0 50 120" fill="none"><rect x="14" y="10" width="22" height="80" rx="4" fill="#fbbf24"/><polygon points="14,90 36,90 25,115" fill="#f97316"/><rect x="14" y="10" width="22" height="14" rx="4" fill="#9ca3af"/></svg>
 <svg class="doodle-el" style="top:52%;left:.8%;width:42px;opacity:.12;animation-duration:5s;animation-delay:3s;" viewBox="0 0 80 80" fill="none"><polygon points="40,5 49,29 75,29 54,46 62,71 40,55 18,71 26,46 5,29 31,29" fill="#10b981"/></svg>
-
 <div class="app">
 <nav class="topnav">
   <div class="brand"><span class="brand-icon">🎯</span> Telesales Quiz</div>
@@ -287,7 +244,6 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
     <button class="btn btn-purple" type="button" data-nav="admin">⚙️ Admin</button>
   </div>
 </nav>
-
 <!-- HOME -->
 <section class="screen active" id="screen-home">
 <div class="home-wrap">
@@ -315,7 +271,6 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
   </div>
 </div>
 </section>
-
 <!-- ADMIN -->
 <section class="screen" id="screen-admin">
 <div class="admin-wrap">
@@ -377,7 +332,6 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
   </div>
 </div>
 </section>
-
 <!-- PLAY -->
 <section class="screen" id="screen-play">
 <div class="play-wrap">
@@ -405,7 +359,6 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
   <div class="answers-grid" id="answers"></div>
 </div>
 </section>
-
 <!-- RESULTS -->
 <section class="screen" id="screen-results">
 <div class="results-wrap">
@@ -423,7 +376,6 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
 </div>
 </section>
 </div>
-
 <!-- HURRAY OVERLAY -->
 <div class="hurray-overlay" id="hurrayOverlay">
   <canvas id="hurrayCanvas"></canvas>
@@ -442,7 +394,6 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
     </div>
   </div>
 </div>
-
 <!-- ADD QUESTION MODAL -->
 <div class="modal-backdrop" id="questionModal">
   <div class="modal">
@@ -471,7 +422,6 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
     </div>
   </div>
 </div>
-
 <!-- CHANGE PASSWORD MODAL -->
 <div class="modal-backdrop" id="securityModal">
   <div class="modal">
@@ -485,35 +435,33 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
     </div>
   </div>
 </div>
-
 <div id="toast"></div>
 <script>
 /* ================================================================
-   TELESALES QUIZ — STABLE STORAGE KEYS (never change these)
+   TELESALES QUIZ — FIXED VERSION
+   Bugs Fixed:
+   1. toggleTraining: quiz.active = !quiz.active  (was quiz.active===false)
+   2. registerEmployee: totalQuestions added in initial upsertReport
+   3. Demo: players/reports cleared by correct key (quiz.code "DEMO00")
    ================================================================ */
 const ADMIN_ID               = "Rahul_Sinha";
 const ADMIN_PASSWORD_DEFAULT = "Delhi@1234";
-
-// ★ STABLE KEYS — fixed forever so data never disappears
 const SK_PUB     = "tq_published";
 const SK_REPORTS = "tq_reports";
 const SK_PLAYERS = "tq_players";
 const SK_SESSION = "tq_admin_session";
 const SK_PASS    = "tq_admin_pass";
 const SK_THEME   = "tq_theme";
-
 const getAdminPass = () => localStorage.getItem(SK_PASS) || ADMIN_PASSWORD_DEFAULT;
 const ANS_COLORS = ["ans-a","ans-b","ans-c","ans-d"];
 const ANS_KEYS   = ["A","B","C","D"];
 const CCOLORS    = ["#fbbf24","#f97316","#10b981","#ec4899","#3b82f6","#7c3aed","#ef4444","#fff","#06b6d4"];
-
 const sampleQs = [
   {q:"What is the first step in a successful cold call?",opts:["Pitch immediately","Build rapport first","Ask for payment","Read a script word-for-word"],correct:1,diff:"easy",pts:100,time:20},
   {q:"Which technique best handles 'I'll think about it'?",opts:["Say OK and hang up","Offer a discount","Ask what they need to think about","Transfer the call"],correct:2,diff:"medium",pts:200,time:25},
   {q:"What does CRM stand for?",opts:["Client Revenue Module","Customer Relationship Management","Corporate Resource Manager","Customer Retention Model"],correct:1,diff:"easy",pts:100,time:15},
   {q:"Best time to ask for a referral?",opts:["Start of call","After a complaint","Right after a successful sale","During negotiation"],correct:2,diff:"hard",pts:300,time:30}
 ];
-
 const state = {
   adminLoggedIn: sessionStorage.getItem(SK_SESSION)==="yes",
   questions:[],currentQuiz:null,
@@ -522,7 +470,6 @@ const state = {
   answered:false,timeLeft:20,timer:null,
   sound:true,audioCtx:null
 };
-
 const $   = id => document.getElementById(id);
 const esc = v  => String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 
@@ -532,7 +479,6 @@ function lsGet(k,fallback){
   catch{ return fallback; }
 }
 function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){ console.error("lsSet",k,e); } }
-
 const loadPublished = ()=> lsGet(SK_PUB,{});
 const savePublished = m  => lsSet(SK_PUB,m);
 const loadReports   = ()=> lsGet(SK_REPORTS,{});
@@ -638,37 +584,43 @@ function showHurray(){
 $("hurrayResultsBtn").addEventListener("click",()=>{ $("hurrayOverlay").classList.remove("active"); buildResults(); showScreen("results"); playClick(); });
 $("hurrayHomeBtn").addEventListener("click",()=>{ $("hurrayOverlay").classList.remove("active"); showScreen("home"); playClick(); });
 
-/* ── REPORTS — FIXED ── */
-function getQuizReports(quizId){ 
-  const key=String(quizId).trim().toUpperCase();
-  const r=loadReports(); 
-  return r[key]||[]; 
+/* ── REPORTS ── */
+function getQuizReports(quizCode){
+  const key=String(quizCode).trim().toUpperCase();
+  const r=loadReports();
+  return r[key]||[];
 }
 
 function upsertReport(quiz,employee,patch){
   const allReports = loadReports();
-  const qid = String(quiz.code).trim().toUpperCase();  // use code — always stable
+  const qid = String(quiz.code).trim().toUpperCase();
   if(!allReports[qid]) allReports[qid] = [];
   const rows = allReports[qid];
   const empCode = String(employee.code).trim();
   const idx = rows.findIndex(r=>String(r.employeeCode).trim()===empCode);
   const base = idx>=0 ? rows[idx] : {
-    employeeCode:empCode, employeeName:String(employee.name),
-    status:"Not Completed", score:0,
-    totalQuestions:quiz.questions.length,
-    startedAt:"", completedAt:""
+    employeeCode:empCode,
+    employeeName:String(employee.name),
+    status:"Not Completed",
+    score:0,
+    totalQuestions:quiz.questions.length,  // ✅ FIX 3: always set from quiz
+    startedAt:"",
+    completedAt:""
   };
-  const updated = Object.assign({}, base, {employeeName:String(employee.name), totalQuestions:quiz.questions.length}, patch||{});
+  const updated = Object.assign({}, base, {
+    employeeName:String(employee.name),
+    totalQuestions:quiz.questions.length   // ✅ FIX 3: always keep in sync
+  }, patch||{});
   if(idx>=0) rows[idx]=updated; else rows.push(updated);
   allReports[qid]=rows;
-  saveReports(allReports); // persist immediately
+  saveReports(allReports);
   return updated;
 }
 
 /* ── REGISTER — ONE ATTEMPT ── */
 function registerEmployee(quiz,employee){
   const all=loadPlayers();
-  const qid=String(quiz.code).trim().toUpperCase();  // use code — always stable
+  const qid=String(quiz.code).trim().toUpperCase();
   if(!all[qid]) all[qid]=[];
   const empCode=String(employee.code).trim();
   if(all[qid].some(p=>String(p.code).trim()===empCode))
@@ -677,7 +629,13 @@ function registerEmployee(quiz,employee){
     throw new Error("🚫 Training has reached its player limit.");
   all[qid].push({code:empCode,name:String(employee.name)});
   savePlayers(all);
-  upsertReport(quiz,employee,{status:"Not Completed",startedAt:new Date().toISOString(),score:0});
+  // ✅ FIX 3: totalQuestions now properly passed
+  upsertReport(quiz, employee, {
+    status:"Not Completed",
+    startedAt:new Date().toISOString(),
+    score:0,
+    totalQuestions:quiz.questions.length
+  });
 }
 
 /* ── RENDER QUESTIONS ── */
@@ -732,40 +690,43 @@ function renderPublishedList(){
   }).join("");
 }
 
+/* ✅ FIX 1: toggleTraining — !quiz.active instead of quiz.active===false */
 window.toggleTraining=function(code){
-  const pub=loadPublished(),quiz=pub[code]; if(!quiz)return;
-  quiz.active=quiz.active===false; pub[code]=quiz; savePublished(pub);
-  renderPublishedList(); toast((quiz.active?"✅ Activated: ":"⏸️ Deactivated: ")+quiz.title); playClick();
+  const pub=loadPublished(), quiz=pub[code]; if(!quiz)return;
+  quiz.active = !quiz.active;  // ✅ FIXED: was (quiz.active===false) which only toggled one way
+  pub[code]=quiz; savePublished(pub);
+  renderPublishedList();
+  toast((quiz.active?"✅ Activated: ":"⏸️ Deactivated: ")+quiz.title);
+  playClick();
 };
+
 window.republishQuiz=function(code){
   const pub=loadPublished(),quiz=pub[code]; if(!quiz){toast("Quiz not found.");return;}
   state.questions=[...quiz.questions]; $("quizTitle").value=quiz.title; $("maxPlayers").value=quiz.maxPlayers;
   renderQuestions(); $("publishBtn").scrollIntoView({behavior:"smooth",block:"center"});
   toast(`📝 "${quiz.title}" loaded. Edit & republish!`); playSuccess();
 };
+
 window.deleteQuiz=function(code){
   if(!confirm("Delete this quiz permanently?"))return;
   const pub=loadPublished(); delete pub[code]; savePublished(pub);
   renderPublishedList(); toast("🗑️ Quiz deleted."); playError();
 };
 
-/* ── DOWNLOAD REPORT — FULLY FIXED ── */
+/* ── DOWNLOAD REPORT ── */
 window.downloadReport=function(code){
   const pub=loadPublished(); const quiz=pub[code];
   if(!quiz){toast("Training not found.");playError();return;}
   const rows=getQuizReports(quiz.code);
-  console.log('[Report] Code:', quiz.code, '| Rows found:', rows.length, '| All reports:', JSON.stringify(loadReports()).slice(0,300));
   if(!rows.length){
     toast("⚠️ No participants found for: "+quiz.code);
     playError();
     return;
   }
-
   const completed=rows.filter(r=>r.status==="Completed");
   const notCompleted=rows.filter(r=>r.status!=="Completed");
   const avgScore=completed.length ? Math.round(completed.reduce((s,r)=>s+Number(r.score||0),0)/completed.length) : 0;
   const totalPossible=quiz.questions.reduce((s,q)=>s+(q.pts||100),0);
-
   const csvRows=[
     ["TELESALES TRAINING REPORT"],
     ["Training Title",quiz.title],
@@ -795,13 +756,11 @@ window.downloadReport=function(code){
       r.completedAt ? new Date(r.completedAt).toLocaleString() : "—"
     ])
   ];
-
   const BOM="\uFEFF";
   const csv=csvRows.map(row=>row.map(cell=>{
     const v=String(cell??"");
     return (v.includes(",")||v.includes('"')||v.includes('\n')) ? `"${v.replace(/"/g,'""')}"` : v;
   }).join(",")).join("\r\n");
-
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([BOM+csv],{type:"text/csv;charset=utf-8"}));
   a.download=`${quiz.code}_report_${new Date().toISOString().slice(0,10)}.csv`;
@@ -885,7 +844,6 @@ function loadQuizFromUrl(){
     const quiz=decodeQuiz(window.location.hash.slice(6));
     const pub=loadPublished();
     const local=pub[quiz.code];
-    // Always preserve stored quiz — NEVER overwrite with URL version (id could differ)
     if(!local){
       pub[quiz.code]={...quiz,active:true};
       savePublished(pub);
@@ -900,6 +858,7 @@ function loadQuizFromUrl(){
     return null;
   }
 }
+
 function findQuiz(code){
   const fromUrl=loadQuizFromUrl();
   if(fromUrl&&(!code||fromUrl.code.toUpperCase()===code.toUpperCase()))return fromUrl;
@@ -963,7 +922,7 @@ window.chooseAnswer=function(index){
     if(bi===index&&index!==q.correct) btn.classList.add("wrong");
   });
   if(index===q.correct){
-    const pts=q.pts||100; // EXACT points — no time bonus
+    const pts=q.pts||100;
     state.score+=pts; state.correctCount++;
     $("scoreChip").textContent=state.score.toLocaleString();
     const sb=$("scoreBox"); sb.classList.remove("bump"); void sb.offsetWidth; sb.classList.add("bump");
@@ -981,21 +940,16 @@ window.chooseAnswer=function(index){
 /* ── FINISH & SAVE REPORT ── */
 function finishQuiz(){
   $("progressBar").style.width="100%";
-  // ★ Save report — using quiz.code as key (stable)
-  const reportData = {
-    status:"Completed",
-    score: state.score,
-    completedAt: new Date().toISOString(),
-    totalQuestions: state.currentQuiz.questions.length
-  };
   upsertReport(
     state.currentQuiz,
     {code:state.employeeCode, name:state.employeeName},
-    reportData
+    {
+      status:"Completed",
+      score: state.score,
+      completedAt: new Date().toISOString(),
+      totalQuestions: state.currentQuiz.questions.length
+    }
   );
-  // Verify save worked
-  const saved = getQuizReports(state.currentQuiz.code);
-  console.log("[Quiz] Report saved for", state.currentQuiz.code, "| Total rows:", saved.length, "| Data:", JSON.stringify(reportData));
   showHurray();
 }
 
@@ -1014,21 +968,32 @@ function buildResults(){
     <div class="stat-card"><div class="stat-val">${state.score.toLocaleString()}</div><div class="stat-lbl">Points</div></div>`;
 }
 
-/* ── DEMO ── */
+/* ✅ FIX 2: Demo — clear by quiz.code "DEMO00" (not by demoId) */
 function useDemo(){
-  const demoId="tq_demo_permanent";
-  const demoQuiz={id:demoId,code:"DEMO00",title:"Demo Training",maxPlayers:9999,active:true,questions:sampleQs,createdAt:new Date().toISOString()};
-  const pub=loadPublished(); pub["DEMO00"]=demoQuiz; savePublished(pub);
-  const all=loadPlayers(); delete all[demoId]; savePlayers(all);
-  const rep=loadReports(); delete rep[demoId]; saveReports(rep);
+  const DEMO_CODE = "DEMO00";
+  const demoQuiz={
+    id:"tq_demo_permanent",
+    code:DEMO_CODE,
+    title:"Demo Training",
+    maxPlayers:9999,
+    active:true,
+    questions:sampleQs,
+    createdAt:new Date().toISOString()
+  };
+  const pub=loadPublished(); pub[DEMO_CODE]=demoQuiz; savePublished(pub);
+
+  // ✅ FIXED: clear by quiz.code key (DEMO00), not by quiz.id
+  const all=loadPlayers();   delete all[DEMO_CODE];   savePlayers(all);
+  const rep=loadReports();   delete rep[DEMO_CODE];   saveReports(rep);
+
   const empCode=$("employeeCode").value.trim()||"999999";
   const empName=$("employeeName").value.trim()||"Demo Player";
-  $("employeeCode").value=empCode; $("employeeName").value=empName; $("roomCode").value="DEMO00";
+  $("employeeCode").value=empCode; $("employeeName").value=empName; $("roomCode").value=DEMO_CODE;
   registerEmployee(demoQuiz,{code:empCode,name:empName});
   state.currentQuiz=demoQuiz; state.employeeCode=empCode; state.employeeName=empName;
   state.currentIndex=0; state.score=0; state.correctCount=0;
   $("playTitle").textContent=demoQuiz.title;
-  $("playerStatus").textContent=`${empName} (${empCode}) · Room DEMO00`;
+  $("playerStatus").textContent=`${empName} (${empCode}) · Room ${DEMO_CODE}`;
   showScreen("play"); renderPlayQuestion(); playSuccess();
 }
 
@@ -1076,48 +1041,34 @@ $("closeSecurityBtn").addEventListener("click",closeSecModal);
 $("savePassBtn").addEventListener("click",savePassword);
 window.addEventListener("hashchange",loadQuizFromUrl);
 
-/* ── MIGRATE OLD DATA (one-time) ── 
-   Old versions stored reports/players by quiz.id
-   New version uses quiz.code — migrate on startup
-*/
+/* ── MIGRATE OLD DATA ── */
 function migrateOldData(){
   try {
     const pub = loadPublished();
     const reports = loadReports();
     const players = loadPlayers();
     let changed = false;
-
     Object.values(pub).forEach(quiz => {
       const codeKey = String(quiz.code).trim().toUpperCase();
       const idKey   = String(quiz.id);
-
-      // If data exists under id-key but NOT under code-key, migrate it
       if(reports[idKey] && !reports[codeKey]){
         reports[codeKey] = reports[idKey];
-        // don't delete old key yet — safe migration
         changed = true;
-        console.log('[Migrate] Reports moved:', idKey, '->', codeKey, reports[codeKey].length, 'rows');
       }
       if(players[idKey] && !players[codeKey]){
         players[codeKey] = players[idKey];
         changed = true;
-        console.log('[Migrate] Players moved:', idKey, '->', codeKey);
       }
-
-      // Also migrate old storage key variants (v1,v2,v3)
       ['telesales.reports.v1','telesales.reports.v2','telesales.reports.v3'].forEach(oldKey => {
         try {
           const old = JSON.parse(localStorage.getItem(oldKey)||'{}');
-          // find by code or id
           const rows = old[codeKey] || old[idKey];
           if(rows && rows.length && !reports[codeKey]){
             reports[codeKey] = rows;
             changed = true;
-            console.log('[Migrate] Reports from', oldKey, '->', codeKey, rows.length, 'rows');
           }
         } catch(e){}
       });
-
       ['telesales.players.v1','telesales.players.v2','telesales.players.v3'].forEach(oldKey => {
         try {
           const old = JSON.parse(localStorage.getItem(oldKey)||'{}');
@@ -1129,12 +1080,7 @@ function migrateOldData(){
         } catch(e){}
       });
     });
-
-    if(changed){
-      saveReports(reports);
-      savePlayers(players);
-      console.log('[Migrate] Data migration complete');
-    }
+    if(changed){ saveReports(reports); savePlayers(players); }
   } catch(e){ console.error('[Migrate] Error:', e); }
 }
 
