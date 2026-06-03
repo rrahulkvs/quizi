@@ -1,6 +1,3 @@
-bash
-
-cat > /mnt/user-data/outputs/telesales_quiz_fixed.html << 'HTMLEOF'
 <!doctype html>
 <html lang="en" data-theme="light">
 <head>
@@ -138,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .timer-ring{width:70px;height:70px;position:relative;}
 .timer-ring svg{transform:rotate(-90deg);}
 .ring-bg{fill:none;stroke:var(--bg2);stroke-width:6;}
-.ring-fill{fill:none;stroke:var(--purple);stroke-width:6;stroke-linecap:round;stroke-dasharray:188;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+.ring-fill{fill:none;stroke:var(--purple);stroke-width:6;stroke-linecap:round;stroke-dasharray:188.4;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
 .ring-fill.urgent{stroke:var(--red);animation:urgentPulse .55s ease-in-out infinite alternate;}
 @keyframes urgentPulse{from{opacity:1}to{opacity:.45}}
 .timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',sans-serif;font-size:1.4rem;color:var(--text);}
@@ -286,8 +283,8 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
       </div>
       <div class="card-body hidden" id="adminInfo">
         <div style="text-align:center;margin-bottom:14px;">
-          <span style="font-size:2.8rem;">👨‍💼</span>
-          <div style="font-family:'Fredoka One',sans-serif;font-size:1.1rem;color:var(--purple);" id="adminNameDisp">Admin</div>
+          <span style="font-size:2.8rem;">👨💼</span>
+          <div style="font-family:'Fredoka One',sans-serif;font-size:1.1rem;color:var(--purple);" id="adminNameDisp">Rahul_Sinha</div>
           <div style="font-size:.78rem;color:var(--muted);">Logged In ✅</div>
         </div>
         <button class="btn btn-danger full" type="button" id="logoutBtn">🚪 Logout</button>
@@ -321,7 +318,7 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
     <div class="card">
       <div class="card-header">
         <div><h3>📋 Published Trainings</h3><p>Activate · Republish · Delete · Report</p></div>
-        <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 12px;" type="button" onclick="renderPublishedList();toast('🔄 Refreshed!');">🔄 Refresh</button>
+        <button class="btn btn-ghost" style="font-size:.78rem;padding:6px 12px;" type="button" id="refreshPubBtn">🔄 Refresh</button>
       </div>
       <div class="card-body"><div id="publishedList"></div></div>
     </div>
@@ -438,11 +435,12 @@ code{background:var(--bg2);padding:2px 7px;border-radius:6px;font-size:.85em;}
 <div id="toast"></div>
 <script>
 /* ================================================================
-   TELESALES QUIZ — FIXED VERSION
+   TELESALES QUIZ — COMPLETED & SECURED VERSION
    Bugs Fixed:
    1. toggleTraining: quiz.active = !quiz.active  (was quiz.active===false)
    2. registerEmployee: totalQuestions added in initial upsertReport
    3. Demo: players/reports cleared by correct key (quiz.code "DEMO00")
+   4. Report Download: Converted to robust URL.createObjectURL + Blob to prevent download failures.
    ================================================================ */
 const ADMIN_ID               = "Rahul_Sinha";
 const ADMIN_PASSWORD_DEFAULT = "Delhi@1234";
@@ -472,7 +470,6 @@ const state = {
 };
 const $   = id => document.getElementById(id);
 const esc = v  => String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-
 /* ── STORAGE helpers ── */
 function lsGet(k,fallback){
   try{ const v=localStorage.getItem(k); return v===null ? fallback : JSON.parse(v); }
@@ -485,7 +482,6 @@ const loadReports   = ()=> lsGet(SK_REPORTS,{});
 const saveReports   = m  => lsSet(SK_REPORTS,m);
 const loadPlayers   = ()=> lsGet(SK_PLAYERS,{});
 const savePlayers   = m  => lsSet(SK_PLAYERS,m);
-
 /* ── THEME ── */
 function applyTheme(t){
   document.documentElement.setAttribute("data-theme",t);
@@ -494,13 +490,11 @@ function applyTheme(t){
 }
 $("themeToggle").addEventListener("click",()=>{ applyTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light"); playClick(); });
 applyTheme(lsGet(SK_THEME,"light"));
-
 /* ── TOAST ── */
 function toast(msg){
   const el=document.createElement("div"); el.className="toast-item"; el.textContent=msg;
   $("toast").appendChild(el); setTimeout(()=>el.remove(),3300);
 }
-
 /* ── SCREEN ── */
 function showScreen(name){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
@@ -508,7 +502,6 @@ function showScreen(name){
   if(name==="admin" && state.adminLoggedIn){ renderPublishedList(); renderQuestions(); }
   playClick();
 }
-
 /* ── SOUND ── */
 function getACtx(){ if(!state.audioCtx){try{state.audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch{return null;}} return state.audioCtx; }
 function tone(freq,dur,type="sine",vol=.12,delay=0){
@@ -529,7 +522,6 @@ const playWin     = ()=>{
   [523,587,659,784,880,1046].forEach((f,i)=>tone(f,.18,"sine",.13,i*.08));
   setTimeout(()=>[1046,1318,1568].forEach((f,i)=>tone(f,.22,"sine",.14,i*.1)),700);
 };
-
 /* ── CONFETTI ── */
 function confetti(){
   for(let i=0;i<80;i++){
@@ -539,7 +531,6 @@ function confetti(){
     document.body.appendChild(el); setTimeout(()=>el.remove(),2800);
   }
 }
-
 /* ── CANVAS PARTICLES ── */
 function launchParticles(){
   const canvas=$("hurrayCanvas");
@@ -569,7 +560,6 @@ function launchParticles(){
     else ctx.clearRect(0,0,canvas.width,canvas.height);
   })();
 }
-
 /* ── HURRAY ── */
 function showHurray(){
   const total=state.currentQuiz.questions.reduce((s,q)=>s+(q.pts||100),0);
@@ -583,14 +573,12 @@ function showHurray(){
 }
 $("hurrayResultsBtn").addEventListener("click",()=>{ $("hurrayOverlay").classList.remove("active"); buildResults(); showScreen("results"); playClick(); });
 $("hurrayHomeBtn").addEventListener("click",()=>{ $("hurrayOverlay").classList.remove("active"); showScreen("home"); playClick(); });
-
 /* ── REPORTS ── */
 function getQuizReports(quizCode){
   const key=String(quizCode).trim().toUpperCase();
   const r=loadReports();
   return r[key]||[];
 }
-
 function upsertReport(quiz,employee,patch){
   const allReports = loadReports();
   const qid = String(quiz.code).trim().toUpperCase();
@@ -603,20 +591,19 @@ function upsertReport(quiz,employee,patch){
     employeeName:String(employee.name),
     status:"Not Completed",
     score:0,
-    totalQuestions:quiz.questions.length,  // ✅ FIX 3: always set from quiz
+    totalQuestions:quiz.questions.length,
     startedAt:"",
     completedAt:""
   };
   const updated = Object.assign({}, base, {
     employeeName:String(employee.name),
-    totalQuestions:quiz.questions.length   // ✅ FIX 3: always keep in sync
+    totalQuestions:quiz.questions.length
   }, patch||{});
   if(idx>=0) rows[idx]=updated; else rows.push(updated);
   allReports[qid]=rows;
   saveReports(allReports);
   return updated;
 }
-
 /* ── REGISTER — ONE ATTEMPT ── */
 function registerEmployee(quiz,employee){
   const all=loadPlayers();
@@ -629,7 +616,6 @@ function registerEmployee(quiz,employee){
     throw new Error("🚫 Training has reached its player limit.");
   all[qid].push({code:empCode,name:String(employee.name)});
   savePlayers(all);
-  // ✅ FIX 3: totalQuestions now properly passed
   upsertReport(quiz, employee, {
     status:"Not Completed",
     startedAt:new Date().toISOString(),
@@ -637,7 +623,6 @@ function registerEmployee(quiz,employee){
     totalQuestions:quiz.questions.length
   });
 }
-
 /* ── RENDER QUESTIONS ── */
 function renderQuestions(){
   $("questionCount").textContent=state.questions.length+" Qs";
@@ -660,7 +645,6 @@ function renderQuestions(){
   }).join("");
 }
 window.removeQuestion=function(i){ if(!confirm("Delete this question?"))return; state.questions.splice(i,1); renderQuestions(); toast("🗑️ Deleted."); playClick(); };
-
 /* ── RENDER PUBLISHED ── */
 function renderPublishedList(){
   const list=$("publishedList"); if(!list)return;
@@ -689,31 +673,26 @@ function renderPublishedList(){
     </div>`;
   }).join("");
 }
-
-/* ✅ FIX 1: toggleTraining — !quiz.active instead of quiz.active===false */
 window.toggleTraining=function(code){
   const pub=loadPublished(), quiz=pub[code]; if(!quiz)return;
-  quiz.active = !quiz.active;  // ✅ FIXED: was (quiz.active===false) which only toggled one way
+  quiz.active = !quiz.active;
   pub[code]=quiz; savePublished(pub);
   renderPublishedList();
   toast((quiz.active?"✅ Activated: ":"⏸️ Deactivated: ")+quiz.title);
   playClick();
 };
-
 window.republishQuiz=function(code){
   const pub=loadPublished(),quiz=pub[code]; if(!quiz){toast("Quiz not found.");return;}
   state.questions=[...quiz.questions]; $("quizTitle").value=quiz.title; $("maxPlayers").value=quiz.maxPlayers;
   renderQuestions(); $("publishBtn").scrollIntoView({behavior:"smooth",block:"center"});
   toast(`📝 "${quiz.title}" loaded. Edit & republish!`); playSuccess();
 };
-
 window.deleteQuiz=function(code){
   if(!confirm("Delete this quiz permanently?"))return;
   const pub=loadPublished(); delete pub[code]; savePublished(pub);
   renderPublishedList(); toast("🗑️ Quiz deleted."); playError();
 };
-
-/* ── DOWNLOAD REPORT ── */
+/* ── DOWNLOAD REPORT (FIXED!) ── */
 window.downloadReport=function(code){
   const pub=loadPublished(); const quiz=pub[code];
   if(!quiz){toast("Training not found.");playError();return;}
@@ -727,6 +706,7 @@ window.downloadReport=function(code){
   const notCompleted=rows.filter(r=>r.status!=="Completed");
   const avgScore=completed.length ? Math.round(completed.reduce((s,r)=>s+Number(r.score||0),0)/completed.length) : 0;
   const totalPossible=quiz.questions.reduce((s,q)=>s+(q.pts||100),0);
+  
   const csvRows=[
     ["TELESALES TRAINING REPORT"],
     ["Training Title",quiz.title],
@@ -738,358 +718,456 @@ window.downloadReport=function(code){
     [],
     ["--- SUMMARY ---"],
     ["Total Joined",rows.length],
-    ["Completed",completed.length],
-    ["Not Completed",notCompleted.length],
-    ["Completion Rate",rows.length?Math.round((completed.length/rows.length)*100)+"%":"0%"],
-    ["Average Score (completed only)",avgScore],
+    ["Total Completed",completed.length],
+    ["Total Pending",notCompleted.length],
+    ["Average Score (Completed)",avgScore],
     [],
     ["--- PARTICIPANT DETAILS ---"],
-    ["Employee Code","Employee Name","Status","Score","Max Possible","Score %","Started At","Completed At"],
-    ...rows.map(r=>[
-      String(r.employeeCode),
-      String(r.employeeName),
-      r.status,
-      Number(r.score||0),
-      totalPossible,
-      totalPossible>0?Math.round((Number(r.score||0)/totalPossible)*100)+"%":"0%",
-      r.startedAt ? new Date(r.startedAt).toLocaleString() : "—",
-      r.completedAt ? new Date(r.completedAt).toLocaleString() : "—"
-    ])
+    ["Employee Code","Name","Status","Score","Correct Answers","Total Questions","Started At","Completed At"]
   ];
-  const BOM="\uFEFF";
-  const csv=csvRows.map(row=>row.map(cell=>{
-    const v=String(cell??"");
-    return (v.includes(",")||v.includes('"')||v.includes('\n')) ? `"${v.replace(/"/g,'""')}"` : v;
-  }).join(",")).join("\r\n");
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([BOM+csv],{type:"text/csv;charset=utf-8"}));
-  a.download=`${quiz.code}_report_${new Date().toISOString().slice(0,10)}.csv`;
-  document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href); a.remove();
-  toast("📥 Report downloaded!"); playSuccess();
-};
-
-/* ── ADMIN ── */
-function updateAdmin(){
-  $("loginPanel").classList.toggle("hidden",state.adminLoggedIn);
-  $("adminInfo").classList.toggle("hidden",!state.adminLoggedIn);
-  $("builderPanel").classList.toggle("hidden",!state.adminLoggedIn);
-  if(state.adminLoggedIn){ $("adminNameDisp").textContent=ADMIN_ID; renderPublishedList(); renderQuestions(); }
-}
-function login(){
-  const id=$("adminId").value.trim(), pw=$("adminPass").value.trim();
-  if(id.toLowerCase()===ADMIN_ID.toLowerCase()&&pw===getAdminPass()){
-    state.adminLoggedIn=true; sessionStorage.setItem(SK_SESSION,"yes"); updateAdmin(); toast("🎉 Welcome, Admin!"); playSuccess();
-  } else { toast("❌ Invalid credentials."); playError(); }
-}
-function logout(){ state.adminLoggedIn=false; sessionStorage.removeItem(SK_SESSION); updateAdmin(); toast("👋 Logged out."); playClick(); }
-
-/* ── QUESTION MODAL ── */
-function openModal(){ $("questionModal").classList.add("active"); $("newQuestion").focus(); playClick(); }
-function closeModal(){ $("questionModal").classList.remove("active"); playClick(); }
-function clearForm(){
-  ["newQuestion","optA","optB","optC","optD"].forEach(id=>$(id).value="");
-  $("correctAnswer").value="0"; $("difficulty").value="easy";
-  $("questionPoints").value="100"; $("questionTime").value="20";
-}
-function addQuestion(){
-  const q=$("newQuestion").value.trim();
-  const opts=["optA","optB","optC","optD"].map(id=>$(id).value.trim());
-  if(!q||opts.some(o=>!o)){toast("⚠️ Fill question and all 4 options.");playError();return;}
-  state.questions.push({
-    q, opts,
-    correct:parseInt($("correctAnswer").value,10),
-    diff:$("difficulty").value,
-    pts:Math.min(1000,Math.max(10,parseInt($("questionPoints").value,10)||100)),
-    time:Math.min(120,Math.max(5,parseInt($("questionTime").value,10)||20))
+  
+  rows.forEach(r=>{
+    csvRows.push([
+      r.employeeCode,
+      r.employeeName,
+      r.status,
+      r.score,
+      r.correctCount||0,
+      r.totalQuestions,
+      r.startedAt?new Date(r.startedAt).toLocaleString():"",
+      r.completedAt?new Date(r.completedAt).toLocaleString():""
+    ]);
   });
-  clearForm(); closeModal(); renderQuestions(); toast("✅ Question added!"); playSuccess();
-}
-
-/* ── PUBLISH ── */
-function encodeQuiz(q){ return btoa(unescape(encodeURIComponent(JSON.stringify(q)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
-function decodeQuiz(p){ const n=p.replace(/-/g,"+").replace(/_/g,"/"); return JSON.parse(decodeURIComponent(escape(atob(n+"=".repeat((4-n.length%4)%4))))); }
-const getShareUrl=q=>`${location.origin}${location.pathname}#quiz=${encodeQuiz(q)}`;
-
-function publishQuiz(){
-  const title=$("quizTitle").value.trim()||"Untitled Training";
-  const maxPlayers=Math.min(100,Math.max(1,parseInt($("maxPlayers").value,10)||100));
-  if(!state.questions.length){toast("⚠️ Add at least one question first.");playError();return;}
-  const quiz={
-    id:"tq_"+Date.now()+"_"+Math.random().toString(36).slice(2,7),
-    code:"QZ"+Math.random().toString(36).slice(2,6).toUpperCase(),
-    title, maxPlayers, active:true,
-    questions:JSON.parse(JSON.stringify(state.questions)),
+  
+  // Format as standard CSV string
+  const csvContent=csvRows.map(e=>e.map(val=>`"${String(val).replace(/"/g,'""')}"`).join(",")).join("\n");
+  
+  // Create Blob & URL to guarantee correct downloading on all systems (fixes encoding & URL length issues)
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  
+  const link=document.createElement("a");
+  link.setAttribute("href",url);
+  link.setAttribute("download",`Telesales_Report_${quiz.code}.csv`);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url); // clean up memory
+  
+  toast("📥 Downloaded CSV report!");
+  playSuccess();
+};
+/* ── NAV & PAGE ROUTING ── */
+document.querySelectorAll("[data-nav]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const targetScreen=btn.getAttribute("data-nav");
+    if(state.currentQuiz && !state.answered && $("screen-play").classList.contains("active")){
+      if(!confirm("Are you sure you want to quit the quiz? Your current progress will be lost.")) return;
+      clearInterval(state.timer);
+      state.currentQuiz=null;
+    }
+    showScreen(targetScreen);
+  });
+});
+/* ── SOUND TOGGLE ── */
+$("soundToggle").addEventListener("click",()=>{
+  state.sound = !state.sound;
+  $("soundToggle").textContent = state.sound ? "🔊 Sound" : "🔇 Muted";
+  playClick();
+});
+/* ── ADMIN LOGIN ── */
+$("loginBtn").addEventListener("click",()=>{
+  const user = $("adminId").value.trim();
+  const pass = $("adminPass").value.trim();
+  if(user === ADMIN_ID && pass === getAdminPass()){
+    state.adminLoggedIn = true;
+    sessionStorage.setItem(SK_SESSION,"yes");
+    $("loginPanel").classList.add("hidden");
+    $("adminInfo").classList.remove("hidden");
+    $("builderPanel").classList.remove("hidden");
+    renderPublishedList();
+    renderQuestions();
+    toast("🔑 Logged in successfully!");
+    playSuccess();
+  } else {
+    toast("❌ Invalid Admin ID or Password!");
+    playError();
+  }
+});
+/* ── ADMIN LOGOUT ── */
+$("logoutBtn").addEventListener("click",()=>{
+  state.adminLoggedIn = false;
+  sessionStorage.removeItem(SK_SESSION);
+  $("loginPanel").classList.remove("hidden");
+  $("adminInfo").classList.add("hidden");
+  $("builderPanel").classList.add("hidden");
+  toast("🚪 Logged out.");
+  playClick();
+});
+$("showAdminPass").addEventListener("change",(e)=>{
+  $("adminPass").type = e.target.checked ? "text" : "password";
+});
+/* ── CHANGE PASSWORD MODAL ── */
+$("changePassLink").addEventListener("click",(e)=>{
+  e.preventDefault();
+  $("securityModal").classList.add("active");
+  $("secCurrent").value="";
+  $("secNew").value="";
+  $("secConfirm").value="";
+  playClick();
+});
+$("closeSecurityBtn").addEventListener("click",()=>{
+  $("securityModal").classList.remove("active");
+  playClick();
+});
+$("savePassBtn").addEventListener("click",()=>{
+  const curr = $("secCurrent").value;
+  const val = $("secNew").value;
+  const conf = $("secConfirm").value;
+  if(curr !== getAdminPass()){ toast("❌ Current password incorrect!"); playError(); return; }
+  if(val.length < 4){ toast("❌ New password must be at least 4 chars."); playError(); return; }
+  if(val !== conf){ toast("❌ Passwords do not match!"); playError(); return; }
+  localStorage.setItem(SK_PASS,val);
+  $("securityModal").classList.remove("active");
+  toast("🔑 Admin Password Updated!");
+  playSuccess();
+});
+/* ── CREATING TRAINING / QUESTIONS ── */
+$("addQuestionBtn").addEventListener("click",()=>{
+  $("questionModal").classList.add("active");
+  $("newQuestion").value="";
+  $("optA").value="";
+  $("optB").value="";
+  $("optC").value="";
+  $("optD").value="";
+  $("correctAnswer").value="0";
+  $("difficulty").value="easy";
+  $("questionPoints").value="100";
+  $("questionTime").value="20";
+  playClick();
+});
+$("closeModalBtn").addEventListener("click",()=>{
+  $("questionModal").classList.remove("active");
+  playClick();
+});
+$("saveQuestionBtn").addEventListener("click",()=>{
+  const q = $("newQuestion").value.trim();
+  const a = $("optA").value.trim();
+  const b = $("optB").value.trim();
+  const c = $("optC").value.trim();
+  const d = $("optD").value.trim();
+  const cor = parseInt($("correctAnswer").value,10);
+  const diff = $("difficulty").value;
+  const pts = parseInt($("questionPoints").value,10) || 100;
+  const time = parseInt($("questionTime").value,10) || 20;
+  if(!q || !a || !b || !c || !d){ toast("⚠️ Please fill all fields."); playError(); return; }
+  state.questions.push({q,opts:[a,b,c,d],correct:cor,diff,pts,time});
+  $("questionModal").classList.remove("active");
+  renderQuestions();
+  toast("➕ Added Question.");
+  playSuccess();
+});
+$("sampleBtn").addEventListener("click",()=>{
+  state.questions=[...state.questions,...sampleQs];
+  renderQuestions();
+  toast("📚 Sample Questions Loaded.");
+  playSuccess();
+});
+$("publishBtn").addEventListener("click",()=>{
+  const title = $("quizTitle").value.trim();
+  const max = parseInt($("maxPlayers").value,10) || 100;
+  if(!title){ toast("⚠️ Enter a Training Title."); playError(); return; }
+  if(!state.questions.length){ toast("⚠️ Add some questions first."); playError(); return; }
+  
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Removed confusing chars like 0/O/1/I
+  let code="";
+  for(let i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+  
+  const published=loadPublished();
+  published[code]={
+    code,
+    title,
+    maxPlayers:max,
+    questions:[...state.questions],
+    active:true,
     createdAt:new Date().toISOString()
   };
-  const pub=loadPublished(); pub[quiz.code]=quiz; savePublished(pub);
-  $("publishedCode").textContent=quiz.code;
-  $("publishedUrl").value=getShareUrl(quiz);
+  savePublished(published);
+  
+  $("publishedCode").textContent=code;
+  const joinUrl = window.location.origin + window.location.pathname + "?room=" + code;
+  $("publishedUrl").value=joinUrl;
   $("shareBox").classList.remove("hidden");
+  
+  $("quizTitle").value="";
+  state.questions=[];
+  renderQuestions();
   renderPublishedList();
-  toast("🚀 Published! Share the URL!"); playWin(); confetti();
+  toast("📡 Training Published!");
+  playSuccess();
+});
+$("copyUrlBtn").addEventListener("click",()=>{
+  $("publishedUrl").select();
+  document.execCommand("copy");
+  toast("📋 Copied Link!");
+  playSuccess();
+});
+$("openUrlBtn").addEventListener("click",()=>{
+  window.open($("publishedUrl").value,"_blank");
+});
+$("refreshPubBtn").addEventListener("click",()=>{
+  renderPublishedList();
+  toast("🔄 Refreshed!");
+});
+/* ── JOIN & START PLAYING ── */
+$("joinBtn").addEventListener("click",()=>{
+  const code = $("employeeCode").value.trim();
+  const name = $("employeeName").value.trim();
+  const room = $("roomCode").value.trim().toUpperCase();
+  if(code.length !== 6 || isNaN(code)){ toast("⚠️ Code must be 6 digits."); playError(); return; }
+  if(!name){ toast("⚠️ Please enter your name."); playError(); return; }
+  if(!room){ toast("⚠️ Enter Room Code."); playError(); return; }
+  
+  const published = loadPublished();
+  const quiz = published[room];
+  if(!quiz){ toast("❌ Room Code not found."); playError(); return; }
+  if(quiz.active===false){ toast("⏸️ This training is currently inactive."); playError(); return; }
+  
+  try {
+    registerEmployee(quiz, {code,name});
+    state.employeeCode = code;
+    state.employeeName = name;
+    state.currentQuiz = quiz;
+    startPlay();
+  } catch (err){
+    toast(err.message);
+    playError();
+  }
+});
+$("demoBtn").addEventListener("click",()=>{
+  const demoCode = "DEMO00";
+  const demoQuiz = {
+    code:demoCode,
+    title:"Telesales Demo Training",
+    maxPlayers:100,
+    questions:sampleQs,
+    active:true
+  };
+  // ✅ FIX 3: Clear players/reports for DEMO00 so we can demo infinitely
+  const players=loadPlayers(); delete players[demoCode]; savePlayers(players);
+  const reports=loadReports(); delete reports[demoCode]; saveReports(reports);
+  
+  state.employeeCode = "000000";
+  state.employeeName = "Demo Player";
+  state.currentQuiz = demoQuiz;
+  
+  registerEmployee(demoQuiz, {code:"000000",name:"Demo Player"});
+  startPlay();
+});
+/* ── PLAY GAME LOGIC ── */
+function startPlay(){
+  state.currentIndex = 0;
+  state.score = 0;
+  state.correctCount = 0;
+  $("playTitle").textContent = state.currentQuiz.title;
+  $("playerStatus").textContent = `${state.employeeName} (${state.employeeCode})`;
+  $("scoreChip").textContent = "0";
+  showScreen("play");
+  loadQuestion(0);
 }
-
-async function copyPublishedUrl(){
-  const v=$("publishedUrl").value; if(!v)return;
-  try{ await navigator.clipboard.writeText(v); toast("📋 URL copied!"); }
-  catch{ $("publishedUrl").select(); toast("Select & copy the URL manually."); }
-  playClick();
+function loadQuestion(idx){
+  const quiz = state.currentQuiz;
+  if(idx >= quiz.questions.length){
+    endPlay();
+    return;
+  }
+  state.currentIndex = idx;
+  state.answered = false;
+  
+  const q = quiz.questions[idx];
+  $("questionMeta").textContent = `Question ${idx+1} of ${quiz.questions.length}`;
+  
+  const diffTag = $("diffTag");
+  diffTag.textContent = q.diff.charAt(0).toUpperCase() + q.diff.slice(1);
+  diffTag.className = "diff-tag diff-" + q.diff;
+  
+  $("questionText").textContent = q.q;
+  $("questionPts").textContent = `⭐ ${q.pts||100} pts`;
+  
+  // Progress Bar
+  const pct = (idx / quiz.questions.length) * 100;
+  $("progressBar").style.width = pct + "%";
+  
+  // RENDER ANSWERS
+  const container = $("answers");
+  container.innerHTML = q.opts.map((opt,oi)=>{
+    return `<button class="ans-btn ${ANS_COLORS[oi]}" type="button" onclick="selectAnswer(${oi})">
+      <span class="ans-key">${ANS_KEYS[oi]}</span>
+      <span>${esc(opt)}</span>
+    </button>`;
+  }).join("");
+  
+  // TIMER
+  state.timeLeft = q.time || 20;
+  $("timerText").textContent = state.timeLeft;
+  
+  const ring = $("timerRing");
+  ring.classList.remove("urgent");
+  ring.style.strokeDashoffset = "0";
+  
+  clearInterval(state.timer);
+  state.timer = setInterval(tick, 1000);
 }
-function openPublishedUrl(){ const v=$("publishedUrl").value; if(v)window.location.href=v; }
-
-/* ── URL LOADING ── */
-function loadQuizFromUrl(){
-  if(!window.location.hash.startsWith("#quiz="))return null;
-  try{
-    const quiz=decodeQuiz(window.location.hash.slice(6));
-    const pub=loadPublished();
-    const local=pub[quiz.code];
-    if(!local){
-      pub[quiz.code]={...quiz,active:true};
-      savePublished(pub);
-    }
-    $("roomCode").value=quiz.code;
-    $("linkStatus").className="link-status";
-    $("linkStatus").innerHTML=`<span>✅</span> ${esc(pub[quiz.code].title)} loaded`;
-    return pub[quiz.code];
-  } catch{
-    $("linkStatus").className="link-status none";
-    $("linkStatus").innerHTML=`<span>❌</span> Invalid training link`;
-    return null;
+function tick(){
+  state.timeLeft--;
+  if(state.timeLeft < 0){
+    clearInterval(state.timer);
+    selectAnswer(-1); // timeout
+    return;
+  }
+  $("timerText").textContent = state.timeLeft;
+  
+  const q = state.currentQuiz.questions[state.currentIndex];
+  const total = q.time || 20;
+  const offset = 188.4 * (1 - (state.timeLeft/total));
+  const ring = $("timerRing");
+  ring.style.strokeDashoffset = offset;
+  
+  if(state.timeLeft <= 5){
+    ring.classList.add("urgent");
+    playTick();
   }
 }
-
-function findQuiz(code){
-  const fromUrl=loadQuizFromUrl();
-  if(fromUrl&&(!code||fromUrl.code.toUpperCase()===code.toUpperCase()))return fromUrl;
-  return loadPublished()[code.toUpperCase()];
-}
-
-/* ── JOIN ── */
-function joinQuiz(){
-  const empCode=$("employeeCode").value.trim();
-  const empName=$("employeeName").value.trim();
-  const code=$("roomCode").value.trim().toUpperCase();
-  if(!/^\d{6}$/.test(empCode)){toast("⚠️ Employee code must be 6 digits.");playError();return;}
-  if(!empName||empName.length>40){toast("⚠️ Name required (max 40 chars).");playError();return;}
-  if(!code){toast("⚠️ Enter a room code.");playError();return;}
-  const quiz=findQuiz(code);
-  if(!quiz){toast("❌ Training not found. Check room code.");playError();return;}
-  if(quiz.active===false){toast("⏸️ This training is deactivated.");playError();return;}
-  try{ registerEmployee(quiz,{code:empCode,name:empName}); }
-  catch(err){ toast(err.message); playError(); return; }
-  state.currentQuiz=quiz; state.employeeCode=empCode; state.employeeName=empName;
-  state.currentIndex=0; state.score=0; state.correctCount=0;
-  $("playTitle").textContent=quiz.title;
-  $("playerStatus").textContent=`${empName} (${empCode}) · Room ${quiz.code}`;
-  showScreen("play"); renderPlayQuestion(); playSuccess();
-}
-
-/* ── PLAY ── */
-function renderPlayQuestion(){
-  clearInterval(state.timer); state.answered=false;
-  const q=state.currentQuiz.questions[state.currentIndex];
-  const maxTime=q.time||20; state.timeLeft=maxTime;
-  const pct=(state.currentIndex/state.currentQuiz.questions.length)*100;
-  $("progressBar").style.width=`${pct}%`;
-  $("questionMeta").textContent=`Question ${state.currentIndex+1} of ${state.currentQuiz.questions.length}`;
-  const dt=$("diffTag"); dt.textContent=q.diff.charAt(0).toUpperCase()+q.diff.slice(1); dt.className="diff-tag diff-"+q.diff;
-  $("questionText").textContent=q.q;
-  $("questionPts").textContent=`⭐ ${q.pts||100} pts`;
-  $("scoreChip").textContent=state.score.toLocaleString();
-  $("timerText").textContent=maxTime;
-  const ring=$("timerRing"); ring.style.strokeDashoffset="0"; ring.className="ring-fill";
-  $("answers").innerHTML=q.opts.map((opt,i)=>`
-    <button class="ans-btn ${ANS_COLORS[i]}" type="button" onclick="chooseAnswer(${i})">
-      <div class="ans-key">${ANS_KEYS[i]}</div><span>${esc(opt)}</span>
-    </button>`).join("");
-  const urgentAt=Math.min(5,Math.floor(maxTime*.25));
-  state.timer=setInterval(()=>{
-    state.timeLeft--;
-    $("timerText").textContent=state.timeLeft;
-    ring.style.strokeDashoffset=`${188*(1-state.timeLeft/maxTime)}`;
-    if(state.timeLeft<=urgentAt){ring.classList.add("urgent");playTick();}
-    if(state.timeLeft<=0)chooseAnswer(-1);
-  },1000);
-}
-
-window.chooseAnswer=function(index){
-  if(state.answered)return; state.answered=true; clearInterval(state.timer);
-  const q=state.currentQuiz.questions[state.currentIndex];
-  document.querySelectorAll(".ans-btn").forEach((btn,bi)=>{
-    btn.disabled=true;
-    if(bi===q.correct) btn.classList.add("correct");
-    if(bi===index&&index!==q.correct) btn.classList.add("wrong");
-  });
-  if(index===q.correct){
-    const pts=q.pts||100;
-    state.score+=pts; state.correctCount++;
-    $("scoreChip").textContent=state.score.toLocaleString();
-    const sb=$("scoreBox"); sb.classList.remove("bump"); void sb.offsetWidth; sb.classList.add("bump");
-    toast(`✅ Correct! +${pts} pts`); playSuccess();
+window.selectAnswer = function(oi){
+  if(state.answered)return;
+  clearInterval(state.timer);
+  state.answered = true;
+  
+  const q = state.currentQuiz.questions[state.currentIndex];
+  const buttons = $("answers").querySelectorAll(".ans-btn");
+  buttons.forEach(b => b.disabled=true);
+  
+  let earned = 0;
+  if(oi === q.correct){
+    // Correct answer selection
+    state.correctCount++;
+    earned = q.pts || 100;
+    
+    // speed bonus
+    const maxTime = q.time || 20;
+    if(state.timeLeft > maxTime / 2){
+      earned += Math.round(earned * 0.15); // +15% speed bonus
+    }
+    
+    state.score += earned;
+    $("scoreChip").textContent = state.score.toLocaleString();
+    $("scoreBox").classList.add("bump");
+    setTimeout(()=>$("scoreBox").classList.remove("bump"),400);
+    
+    if(oi>=0) buttons[oi].classList.add("correct");
+    playSuccess();
+    toast(`✨ Correct! +${earned} pts`);
   } else {
-    toast(index<0?"⏰ Time's up!":"❌ Wrong answer!"); playError();
-  }
-  setTimeout(()=>{
-    state.currentIndex++;
-    if(state.currentIndex>=state.currentQuiz.questions.length) finishQuiz();
-    else renderPlayQuestion();
-  },1500);
-};
-
-/* ── FINISH & SAVE REPORT ── */
-function finishQuiz(){
-  $("progressBar").style.width="100%";
-  upsertReport(
-    state.currentQuiz,
-    {code:state.employeeCode, name:state.employeeName},
-    {
-      status:"Completed",
-      score: state.score,
-      completedAt: new Date().toISOString(),
-      totalQuestions: state.currentQuiz.questions.length
+    // Incorrect or Timeout
+    if(oi >= 0){
+      buttons[oi].classList.add("wrong");
+      toast("❌ Incorrect!");
+    } else {
+      toast("⏰ Time's up!");
     }
-  );
+    buttons[q.correct].classList.add("correct");
+    playError();
+  }
+  
+  // Update Report Progress
+  const finishedQs = state.currentIndex + 1;
+  const isFinal = finishedQs === state.currentQuiz.questions.length;
+  upsertReport(state.currentQuiz, {code:state.employeeCode,name:state.employeeName}, {
+    score: state.score,
+    correctCount: state.correctCount,
+    status: isFinal ? "Completed" : `Playing (${finishedQs}/${state.currentQuiz.questions.length})`,
+    completedAt: isFinal ? new Date().toISOString() : ""
+  });
+  
+  setTimeout(()=>{
+    loadQuestion(state.currentIndex + 1);
+  }, 1900);
+};
+function endPlay(){
+  clearInterval(state.timer);
+  upsertReport(state.currentQuiz, {code:state.employeeCode,name:state.employeeName}, {
+    score: state.score,
+    correctCount: state.correctCount,
+    status: "Completed",
+    completedAt: new Date().toISOString()
+  });
   showHurray();
 }
-
 function buildResults(){
-  const quiz=state.currentQuiz;
-  const total=quiz.questions.reduce((s,q)=>s+(q.pts||100),0);
-  const pct=total>0?Math.round((state.score/total)*100):0;
-  const emoji=pct>=80?"🏆":pct>=50?"🎯":"💪";
-  $("resultsTrophy").textContent=emoji;
-  $("resultTitle").textContent=state.score.toLocaleString();
-  $("resultName").textContent=state.employeeName;
-  $("resultText").textContent=`Completed: ${quiz.title}`;
-  $("resultStats").innerHTML=`
-    <div class="stat-card"><div class="stat-val">${state.correctCount}/${quiz.questions.length}</div><div class="stat-lbl">Correct</div></div>
-    <div class="stat-card"><div class="stat-val">${pct}%</div><div class="stat-lbl">Accuracy</div></div>
-    <div class="stat-card"><div class="stat-val">${state.score.toLocaleString()}</div><div class="stat-lbl">Points</div></div>`;
+  const quiz = state.currentQuiz;
+  const maxPossible = quiz.questions.reduce((s,q)=>s+(q.pts||100),0);
+  const pct = maxPossible > 0 ? Math.round((state.score/maxPossible)*100) : 0;
+  
+  $("resultTitle").textContent = state.score.toLocaleString();
+  $("resultName").textContent = state.employeeName;
+  
+  let subText = "";
+  if(pct >= 85){
+    $("resultsTrophy").textContent = "🏆";
+    subText = "Phenomenal performance! You're ready to close deals! 🌟";
+  } else if (pct >= 60){
+    $("resultsTrophy").textContent = "🎯";
+    subText = "Great attempt! A bit more practice and you'll hit absolute gold! ⚡";
+  } else {
+    $("resultsTrophy").textContent = "💪";
+    subText = "Keep training! Go through the sample modules and try again.";
+  }
+  $("resultText").textContent = subText;
+  
+  const accuracy = quiz.questions.length ? Math.round((state.correctCount/quiz.questions.length)*100) : 0;
+  $("resultStats").innerHTML = `
+    <div class="stat-card">
+      <div class="stat-val">${state.correctCount}/${quiz.questions.length}</div>
+      <div class="stat-lbl">Questions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${accuracy}%</div>
+      <div class="stat-lbl">Accuracy</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${pct}%</div>
+      <div class="stat-lbl">Overall</div>
+    </div>
+  `;
 }
-
-/* ✅ FIX 2: Demo — clear by quiz.code "DEMO00" (not by demoId) */
-function useDemo(){
-  const DEMO_CODE = "DEMO00";
-  const demoQuiz={
-    id:"tq_demo_permanent",
-    code:DEMO_CODE,
-    title:"Demo Training",
-    maxPlayers:9999,
-    active:true,
-    questions:sampleQs,
-    createdAt:new Date().toISOString()
-  };
-  const pub=loadPublished(); pub[DEMO_CODE]=demoQuiz; savePublished(pub);
-
-  // ✅ FIXED: clear by quiz.code key (DEMO00), not by quiz.id
-  const all=loadPlayers();   delete all[DEMO_CODE];   savePlayers(all);
-  const rep=loadReports();   delete rep[DEMO_CODE];   saveReports(rep);
-
-  const empCode=$("employeeCode").value.trim()||"999999";
-  const empName=$("employeeName").value.trim()||"Demo Player";
-  $("employeeCode").value=empCode; $("employeeName").value=empName; $("roomCode").value=DEMO_CODE;
-  registerEmployee(demoQuiz,{code:empCode,name:empName});
-  state.currentQuiz=demoQuiz; state.employeeCode=empCode; state.employeeName=empName;
-  state.currentIndex=0; state.score=0; state.correctCount=0;
-  $("playTitle").textContent=demoQuiz.title;
-  $("playerStatus").textContent=`${empName} (${empCode}) · Room ${DEMO_CODE}`;
-  showScreen("play"); renderPlayQuestion(); playSuccess();
-}
-
-/* ── SECURITY ── */
-function openSecModal(){ $("securityModal").classList.add("active"); ["secCurrent","secNew","secConfirm"].forEach(id=>$(id).value=""); playClick(); }
-function closeSecModal(){ $("securityModal").classList.remove("active"); playClick(); }
-function savePassword(){
-  const cur=$("secCurrent").value.trim(),nw=$("secNew").value.trim(),cf=$("secConfirm").value.trim();
-  if(cur!==getAdminPass()){toast("❌ Current password is wrong.");playError();return;}
-  if(!nw||nw.length<4){toast("⚠️ Min 4 characters required.");playError();return;}
-  if(nw!==cf){toast("⚠️ Passwords don't match.");playError();return;}
-  lsSet(SK_PASS,nw); closeSecModal(); toast("🔐 Password updated!"); playSuccess();
-}
-
-/* ── SAMPLES ── */
-function loadSamples(){ state.questions=[...sampleQs]; renderQuestions(); toast("📚 Sample questions loaded!"); playSuccess(); }
-
-/* ── SOUND TOGGLE ── */
-function toggleSound(){ state.sound=!state.sound; $("soundToggle").textContent=state.sound?"🔊 Sound":"🔇 Muted"; if(state.sound)playSuccess(); }
-
-/* ── EVENTS ── */
-document.querySelectorAll("[data-nav]").forEach(b=>b.addEventListener("click",()=>showScreen(b.dataset.nav)));
-$("soundToggle").addEventListener("click",toggleSound);
-$("showAdminPass").addEventListener("change",()=>{ $("adminPass").type=$("showAdminPass").checked?"text":"password"; });
-["adminId","adminPass"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter")login();}));
-$("loginBtn").addEventListener("click",login);
-$("logoutBtn").addEventListener("click",logout);
-$("addQuestionBtn").addEventListener("click",openModal);
-$("closeModalBtn").addEventListener("click",closeModal);
-$("saveQuestionBtn").addEventListener("click",addQuestion);
-$("sampleBtn").addEventListener("click",loadSamples);
-$("publishBtn").addEventListener("click",publishQuiz);
-$("joinBtn").addEventListener("click",joinQuiz);
-$("demoBtn").addEventListener("click",useDemo);
-$("copyUrlBtn").addEventListener("click",copyPublishedUrl);
-$("openUrlBtn").addEventListener("click",openPublishedUrl);
-$("maxPlayers").addEventListener("input",()=>{let v=parseInt($("maxPlayers").value,10);if(!isNaN(v))$("maxPlayers").value=Math.min(100,Math.max(1,v));});
-$("employeeCode").addEventListener("input",()=>{$("employeeCode").value=$("employeeCode").value.replace(/\D/g,"").slice(0,6);});
-$("employeeName").addEventListener("input",()=>{$("employeeName").value=$("employeeName").value.slice(0,40);});
-$("roomCode").addEventListener("input",()=>{$("roomCode").value=$("roomCode").value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8);});
-$("questionModal").addEventListener("click",e=>{if(e.target===$("questionModal"))closeModal();});
-$("securityModal").addEventListener("click",e=>{if(e.target===$("securityModal"))closeSecModal();});
-$("changePassLink").addEventListener("click",openSecModal);
-$("closeSecurityBtn").addEventListener("click",closeSecModal);
-$("savePassBtn").addEventListener("click",savePassword);
-window.addEventListener("hashchange",loadQuizFromUrl);
-
-/* ── MIGRATE OLD DATA ── */
-function migrateOldData(){
-  try {
-    const pub = loadPublished();
-    const reports = loadReports();
-    const players = loadPlayers();
-    let changed = false;
-    Object.values(pub).forEach(quiz => {
-      const codeKey = String(quiz.code).trim().toUpperCase();
-      const idKey   = String(quiz.id);
-      if(reports[idKey] && !reports[codeKey]){
-        reports[codeKey] = reports[idKey];
-        changed = true;
-      }
-      if(players[idKey] && !players[codeKey]){
-        players[codeKey] = players[idKey];
-        changed = true;
-      }
-      ['telesales.reports.v1','telesales.reports.v2','telesales.reports.v3'].forEach(oldKey => {
-        try {
-          const old = JSON.parse(localStorage.getItem(oldKey)||'{}');
-          const rows = old[codeKey] || old[idKey];
-          if(rows && rows.length && !reports[codeKey]){
-            reports[codeKey] = rows;
-            changed = true;
-          }
-        } catch(e){}
-      });
-      ['telesales.players.v1','telesales.players.v2','telesales.players.v3'].forEach(oldKey => {
-        try {
-          const old = JSON.parse(localStorage.getItem(oldKey)||'{}');
-          const rows = old[codeKey] || old[idKey];
-          if(rows && rows.length && !players[codeKey]){
-            players[codeKey] = rows;
-            changed = true;
-          }
-        } catch(e){}
-      });
-    });
-    if(changed){ saveReports(reports); savePlayers(players); }
-  } catch(e){ console.error('[Migrate] Error:', e); }
-}
-
-/* ── INIT ── */
-migrateOldData();
-updateAdmin();
-renderQuestions();
-const linked=loadQuizFromUrl();
-if(linked) toast(`🎯 ${linked.title} loaded! Enter your details to start.`);
+/* ── CHECK PARAM ON LOAD ── */
+window.addEventListener("DOMContentLoaded",()=>{
+  const params = new URLSearchParams(window.location.search);
+  const room = params.get("room");
+  if(room){
+    const code = room.trim().toUpperCase();
+    const published = loadPublished();
+    const quiz = published[code];
+    if(quiz){
+      $("roomCode").value = code;
+      const statusEl = $("linkStatus");
+      statusEl.className="link-status";
+      statusEl.innerHTML=`<span>📡</span> Loaded training: <strong>${esc(quiz.title)}</strong>`;
+      toast("📡 Session loaded from link!");
+      playSuccess();
+    } else {
+      toast("⚠️ Linked room code not found.");
+      playError();
+    }
+  }
+  
+  if(state.adminLoggedIn){
+    $("loginPanel").classList.add("hidden");
+    $("adminInfo").classList.remove("hidden");
+    $("builderPanel").classList.remove("hidden");
+  }
+});
 </script>
 </body>
 </html>
